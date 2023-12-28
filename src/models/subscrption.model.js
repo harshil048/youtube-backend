@@ -12,3 +12,5 @@ const subscriptionSchema = new Schema({
 },{timestamps: true})
 
 export const Subscription = mongoose.model("Subscription", subscriptionSchema);
+
+// for finding the number of subscriber we find it using channel
