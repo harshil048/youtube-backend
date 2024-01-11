@@ -4,6 +4,7 @@ import { ApiError } from '../utils/ApiError.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
 
+
 const getAllVideos = asyncHandler(async (req, res) => {
 
 });
@@ -15,7 +16,7 @@ const publishVideo = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'All fields are requried');
   }
   const videoLocalPath = req.files?.videoFile[0]?.path;
-  
+
   if (!videoLocalPath) {
     throw new ApiError(400, 'Please select video file');
   }
@@ -35,9 +36,37 @@ const publishVideo = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'thumbnail is required');
   }
 
+  const videoFile = await Video.create({
+    title,
+    description,
+    videoFile: video.url,
+    thumbnail: thumbnail.url,
+    duration: video.duration
+  });
+
+  const VideoUploaded = await Video.findById(videoFile._id);
+
+  if (!VideoUploaded) throw new ApiError(500, 'Something went wrong while uploading the video');
+
   return res.status(201).json(
-    new ApiResponse(201, {title, description, video, thumbnail}, "Video Uploaded Successfully")
+    new ApiResponse(201, VideoUploaded, "Video Uploaded Successfully")
   )
 })
 
-export {publishVideo};
+const getVideoById = asyncHandler(async (req, res) => {
+  const { videoId } = req.params;
+
+  if (!videoId?.trim()) {
+    throw new ApiError(400, 'Video id is missing');
+  }
+  
+  const video = await Video.findById(videoId);
+
+  if(!video){
+    throw new ApiError(404, "video file not found");
+  }
+
+  return res.status(201).json(new ApiResponse(200, video, "Video fetched successfully"));
+})
+
+export { publishVideo, getVideoById };
