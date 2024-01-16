@@ -1,6 +1,6 @@
-# YouTube Backend Clone
+# YouTube Backend
 
-Welcome to the YouTube Backend Clone project! This comprehensive backend application replicates the core functionality of YouTube, providing a robust foundation for video platform.
+Welcome to the YouTube Backend project! This comprehensive backend application replicates the core functionality of YouTube, providing a robust foundation for video platform.
 
 ## Table of Contents
 
