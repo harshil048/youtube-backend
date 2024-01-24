@@ -5,6 +5,7 @@ import { Playlist } from "../models/playlist.model.js";
 import { Video } from "../models/video.model.js";
 import { User } from "../models/user.model.js";
 import { Types } from "mongoose";
+import { json } from "express";
 
 
 const createPlaylist = asyncHandler(async (req, res) => {
@@ -125,4 +126,49 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
   return res.status(201).json(new ApiResponse(200, { updatedPlaylist }, "Video Removed Successfully"));
 })
 
-export { createPlaylist, addVideoToPlaylist, getUserPlaylists, getPlaylistById, removeVideoFromPlaylist };
+const deletePlaylist = asyncHandler(async(req, res)=>{
+  const {playlistId} = req.params;
+
+  if(!playlistId){
+    throw new ApiError(400,'Invalid playlist id');
+  }
+
+  const playlist = await Playlist.findById(playlistId);
+
+  if(!playlist){
+    throw new ApiError(404, "Playlist not found");
+  }
+
+  const deletedPlaylist = await Playlist.findByIdAndDelete(playlistId);
+  if(!deletePlaylist){
+    throw new ApiError(500, "Something went wrong while deleting the playlist");
+  }
+  return res.status(201).json(new ApiResponse(200, {}, "Playlist delete successfully"));
+})
+
+const updatePlaylist = asyncHandler(async(req, res)=>{
+    const {playlistId} = req.params;
+    const{name, description} = req.body;
+
+    if(!playlistId){
+      throw new ApiError(400, "Invalid playlist id");
+    }
+    if(!name && !description){
+      throw new ApiError(400, "name or description required");
+    }
+
+    const playlist = await Playlist.findByIdAndUpdate(playlistId,{
+      $set:{
+        name,
+        description
+      }
+    },{new:true});
+    if(!playlist){
+      throw new ApiError(404, "Playlist not found");
+    }
+
+    return res.status(201).json(new ApiResponse(200, {playlist}, "Playlist updated successfully"));
+
+})
+
+export { createPlaylist, addVideoToPlaylist, getUserPlaylists, getPlaylistById, removeVideoFromPlaylist, deletePlaylist, updatePlaylist };
